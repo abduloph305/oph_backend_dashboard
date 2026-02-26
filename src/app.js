@@ -14,8 +14,28 @@ import templateRoutes from "./modules/template/template.routes.js";
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  "https://ophfrontenddashboard.vercel.app",
+  "http://localhost:3000"
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
+
 
 // Routes
 app.use("/api/auth", authRoutes);
