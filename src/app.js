@@ -14,25 +14,33 @@ import templateRoutes from "./modules/template/template.routes.js";
 
 const app = express();
 
-const allowedOrigins = [
-  "https://ophfrontenddashboard.vercel.app",
-  "http://localhost:3000"
-];
+const allowedOrigins = new Set([
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:5173",
+    "http://localhost:5000",
+    "https://ophfrontenddashboard.vercel.app",
+    "https://ophfrontenddashboard-iu2ofop11-abduloph305-8893s-projects.vercel.app"
+]);
 
-app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or Postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            console.log("Incoming origin:", origin);
+
+            if (!origin) return callback(null, true);
+
+            if (allowedOrigins.has(origin)) {
+                return callback(null, true);
+            }
+
+            return callback(new Error("Not allowed by CORS"));
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+);
 
 app.use(express.json());
 
